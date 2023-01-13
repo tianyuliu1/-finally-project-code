@@ -1,0 +1,118 @@
+from typing import List
+from collections import namedtuple
+import time
+
+class Point(namedtuple("Point", "x y")): #Define the tuple point, which has two attributes x and y
+    def __repr__(self) -> str:
+        return f'Point{tuple(self)!r}'  #Return results.eg:point(x,y) 
+
+class Rectangle(namedtuple("Rectangle", "lower upper")):  #Define the tuple point, which has two attributes
+    def __repr__(self) -> str:
+        return f'Rectangle{tuple(self)!r}'
+    def is_contains(self, p: Point) -> bool:  #Judge whether the point is within the range
+        return self.lower.x <= p.x <= self.upper.x and self.lower.y <= p.y <= self.upper.y
+
+class Node(namedtuple("Node", "location left right")):
+    def __repr__(self):
+        return f'{tuple(self)!r}'
+
+class KDTree:
+    def __init__(self):   #Define variables
+        self._root = None
+        self._n = 0
+
+    def insert(self, p: List[Point]):
+        """insert a list of points"""
+
+        if not p : #The list is empty, ending recursion
+            return
+        if self._n = 0:  #Split by x, y in turn
+            p = sorted(p,key=lambda x:x.x)  #Define the function to assign the value of x.x to x
+            self._n = 1    
+        elif self._n = 1
+            p = sorted(p,key=lambda x:x.y)  
+            self._n = 0
+        median=len(p)//2 #Intermediate value found
+        if self._n == 0:
+            self._n = 1  #Temporarily assign a value, and execute elif after executing once
+            self._root=Node(p[median],self.insert(p[:median]),self.insert(p[median+1:]))  #Recursive, the intermediate node is location.The points separated by the middle node continue to be classified at the corresponding edge
+        else:
+            n=Node(p[median],self.insert(p[:median]),self.insert(p[median+1:]))
+            return n    #Return results
+
+    def range(self, rectangle: Rectangle) -> List[Point]:
+        """range query"""
+        l=[]    #storage structure
+        n=self._root
+        if n==None:    #当根为空时，直接返回
+            return l
+        n_lis=[n]
+        for i in n_lis:     
+            if rectangle.is_contains(i.location):    #判断中间节点
+                l.append(i.location)
+            if i.left!=None:      
+                n_lis.append(i.left)
+            if i.right != None:    
+                n_lis.append(i.right)
+        return l
+
+def range_test():
+    points = [Point(7, 2), Point(5, 4), Point(9, 6), Point(4, 7), Point(8, 1), Point(2, 3)]
+    kd = KDTree()
+    kd.insert(points)
+    result = kd.range(Rectangle(Point(0, 0), Point(6, 6)))
+    assert sorted(result) == sorted([Point(2, 3), Point(5, 4)])
+
+def performance_test():
+    points = [Point(x, y) for x in range(1000) for y in range(1000)]
+
+    lower = Point(500, 500)
+    upper = Point(504, 504)
+    rectangle = Rectangle(lower, upper)
+    #  naive method
+    start = int(round(time.time() * 1000))
+    result1 = [p for p in points if rectangle.is_contains(p)]
+    end = int(round(time.time() * 1000))
+    print(f'Naive method: {end - start}ms')
+
+    kd = KDTree()
+    kd.insert(points)
+    # k-d tree
+    start = int(round(time.time() * 1000))
+    result2 = kd.range(rectangle)
+    end = int(round(time.time() * 1000))
+    print(f'K-D tree: {end - start}ms')
+
+    assert sorted(result1) == sorted(result2)
+
+if __name__ == '__main__':
+    range_test()
+    performance_test()
+    
+    
+    
+5.伪代码：
+Algorithm: get_nearest(self,point) 
+input:kdtree and point
+output: nearest point
+nearest <= self._root 
+nearest_dist <= [(nearest.x-point.x)^2+(nearest.y-point.y)^2]#Calculate distance
+next <= self._root               
+near_nodes <= []     
+serach(next, near_nodes) #Search cotyledon   
+    
+while len(near_nodes) != 0:
+    next <= near_nodes[len(near_nodes) - 1]
+    near_nodes.pop(len(near_nodes) - 1)
+#Detect whether it intersects. If it intersects, it will enter another sub-chain
+    if abs(point[next.split] - next.n[next.split] < nearest_dist):
+        if point[next.split] <= next.n[next.split]:
+            next = next.right
+        end
+        else:
+            next = next.left            
+        end
+        serach(next, near_nodes)
+    end
+return nearest
+end
