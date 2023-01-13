@@ -26,34 +26,58 @@ class KDTree:
 
         if not p : #The list is empty, ending recursion
             return
-        if self._n = 0:  #Split by x, y in turn
-            p = sorted(p,key=lambda x:x.x)  #Define the function to assign the value of x.x to x
+        if self._n = 0:     #Split by x, y in turn
+            p = sorted(p,key=lambda x:x.x)     #Define the function to assign the value of x.x to x
             self._n = 1    
         elif self._n = 1
             p = sorted(p,key=lambda x:x.y)  
             self._n = 0
-        median=len(p)//2 #Intermediate value found
+        median=len(p)//2     #Intermediate value found
         if self._n == 0:
-            self._n = 1  #Temporarily assign a value, and execute elif after executing once
-            self._root=Node(p[median],self.insert(p[:median]),self.insert(p[median+1:]))  #Recursive, the intermediate node is location.The points separated by the middle node continue to be classified at the corresponding edge
+            self._n = 1     #Temporarily assign a value, and execute elif after executing once
+            self._root=Node(p[median],self.insert(p[:median]),self.insert(p[median+1:]))   #Recursive, the intermediate node is location.The points separated by the middle node continue to be classified at the corresponding edge
         else:
             n=Node(p[median],self.insert(p[:median]),self.insert(p[median+1:]))
             return n    #Return results
 
     def range(self, rectangle: Rectangle) -> List[Point]:
         """range query"""
-        l=[]    #storage structure
+        l=[]      #container
         n=self._root
-        if n==None:    #当根为空时，直接返回
+        if n==None:                    #If it is empty, return directly
             return l
         n_lis=[n]
-        for i in n_lis:     
-            if rectangle.is_contains(i.location):    #判断中间节点
-                l.append(i.location)
-            if i.left!=None:      
-                n_lis.append(i.left)
-            if i.right != None:    
-                n_lis.append(i.right)
+        coordinate_lis=[0]             #0 for x，1 for y，For alternate xy segmentation
+        for ind,i in enumerate(n_lis):    #Take out two variables to loop
+            if i==None:
+                continue
+            coordinate=coordinate_lis[ind]
+            if coordinate==0:     #Compare according to the size of x. If it is larger than upper.x, it will be retrieved from the left sub-column. If it is smaller than lower.x, it is the same as the previous situation.
+                if rectangle.lower.x<=i.location.x<=rectangle.upper.x:
+                    n_lis.append(i.right)
+                    n_lis.append(i.left)
+                    coordinate_lis+=[1-coordinate]*2
+                    if rectangle.lower.y<=i.location.y<=rectangle.upper.y:   #When x meets the requirements, check y to see if it is in the area
+                        l.append(i.location)
+                elif i.location.x<rectangle.lower.x:
+                    n_lis.append(i.right)
+                    coordinate_lis.append(1-coordinate)
+                else :
+                    n_lis.append(i.left)
+                    coordinate_lis.append(1 - coordinate)
+            else:       
+                if rectangle.lower.y<=i.location.y<=rectangle.upper.y:  #Compare according to the size of y
+                    n_lis.append(i.right)
+                    n_lis.append(i.left)
+                    coordinate_lis+=[1-coordinate]*2
+                    if rectangle.lower.x<=i.location.x<=rectangle.upper.x:
+                        l.append(i.location)
+                elif i.location.y<rectangle.lower.y:
+                    n_lis.append(i.right)
+                    coordinate_lis.append(1-coordinate)
+                else :
+                    n_lis.append(i.left)
+                    coordinate_lis.append(1 - coordinate)
         return l
 
 def range_test():
