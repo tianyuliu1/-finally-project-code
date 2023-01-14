@@ -21,7 +21,7 @@ class KDTree:
         self._root = None
         self._n = 0
 
-    def insert(self, p: List[Point],d==0):
+    def insert(self, p: List[Point],d=0):
         """insert a list of points"""
 
         if not p : #The list is empty, ending recursion
