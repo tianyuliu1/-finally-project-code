@@ -21,23 +21,29 @@ class KDTree:
         self._root = None
         self._n = 0
 
-    def insert(self, p: List[Point]):
+    def insert(self, p: List[Point],d==0):
         """insert a list of points"""
 
         if not p : #The list is empty, ending recursion
             return
-        if self._n = 0:     #Split by x, y in turn
-            p = sorted(p,key=lambda x:x.x)     #Define the function to assign the value of x.x to x
-            self._n = 1    
-        elif self._n = 1
+        if d = 0:     #Split by x, y in turn 
+            p = sorted(p,key=lambda x:x.x)     #Define the function to assign the value of x.x to x    
+        elif d = 1
             p = sorted(p,key=lambda x:x.y)  
-            self._n = 0
         median=len(p)//2     #Intermediate value found
+        median_value=p[median]
+        if median_value==p[-1]:    #When the middle value is the same, select one as the root
+            median=len(p)-1
+        else:
+            for i in range(median,len(p)):    #Reduce the position of the value larger than the middle value by one
+                if p[i]>median_value:
+                    median=i-1
+                    break
         if self._n == 0:
             self._n = 1     #Temporarily assign a value, and execute elif after executing once
-            self._root=Node(p[median],self.insert(p[:median]),self.insert(p[median+1:]))   #Recursive, the intermediate node is location.The points separated by the middle node continue to be classified at the corresponding edge
+            self._root=Node(p[median],self.insert(p[:median],1-d),self.insert(p[median+1:],1-d))   #Recursive, the intermediate node is location.The points separated by the middle node continue to be classified at the corresponding edge
         else:
-            n=Node(p[median],self.insert(p[:median]),self.insert(p[median+1:]))
+            n=Node(p[median],self.insert(p[:median],1-d),self.insert(p[median+1:],1-d))
             return n    #Return results
 
     def range(self, rectangle: Rectangle) -> List[Point]:
